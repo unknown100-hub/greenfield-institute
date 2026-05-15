@@ -3,11 +3,11 @@
 --  Compatible with: MySQL 8.0+ / MariaDB 10.5+
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS greenfield_institute
+CREATE DATABASE IF NOT EXISTS greenfield institute
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE greenfield_institute;
+USE greenfield institute;
 
 -- ------------------------------------------------------------
 --  STUDENTS
