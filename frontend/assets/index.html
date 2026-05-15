@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Greenfield Institute – Course Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel ="stylesheet" href="styles.css"/>
+  
+  <style>
+   
+
+  </style>
+</head>
+
+<body>
+
+<!-- login -->
+<div id="login-page">
+  <div class="login-card">
+    <div class="login-logo">Greenfield Institute</div>
+    <p class="login-tagline">Course Registration System</p>
+
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <div id="auth-alert" class="alert hidden"></div>
+
+    <!-- Registration name field (hidden on login tab) -->
+    <div class="field" id="field-name" style="display:none">
+      <label>Full Name</label>
+      <input type="text" id="reg-name" placeholder=" eg.Jane Doe" />
+    </div>
+
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="auth-email" placeholder="you@greenfield.edu" />
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="auth-password" placeholder="••••••••"
+             onkeydown="if(event.key==='Enter') submitAuth()" />
+    </div>
+
+    <button class="btn btn-primary btn-full" onclick="submitAuth()">
+      <span id="auth-btn-label">Sign In</span>
+    </button>
+
+    <div class="demo-hint">
+      <strong>Demo accounts:</strong><br>
+      Admin — admin@greenfield.edu / admin123<br>
+      Student — muthem116@gmail.com/test1234
+    </div>
+  </div>
+</div>
+
+
+<div id="app" class="hidden">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-brand">Greenfield</div>
+
+    <!-- Student nav -->
+    <div class="nav-links" id="student-nav">
+      <button class="nav-link active" onclick="showPage('browse')">Browse Courses</button>
+      <button class="nav-link"        onclick="showPage('my-courses')">My Courses</button>
+    </div>
+
+    <!-- Admin nav -->
+    <div class="nav-links hidden" id="admin-nav">
+      <button class="nav-link active" onclick="showPage('manage')">Manage Courses</button>
+      <button class="nav-link"        onclick="showPage('registrations')">Registrations</button>
+      <button class="nav-link"        onclick="showPage('xml')">XML Export</button>
+    </div>
+
+    <div class="nav-user">
+      <span class="user-name" id="nav-username"></span>
+      <span class="role-badge" id="nav-role-badge"></span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- ── TOAST ── -->
+    <div id="toast" class="hidden"></div>
+
+    <!-- ── PAGE: BROWSE COURSES (Student) ── -->
+    <section id="page-browse" class="hidden">
+      <div class="page-header">
+        <h1 class="page-title">Course Catalog</h1>
+        <p class="page-sub">Browse and register for available courses · Fall 2026</p>
+      </div>
+      <div class="stats-bar" id="browse-stats"></div>
+      <div class="toolbar">
+        <input class="search-box" type="text" id="browse-search"
+               placeholder="Search by course, code, or instructor…"
+               oninput="renderBrowse()" />
+      </div>
+      <div class="course-grid" id="browse-grid"></div>
+    </section>
+
+    <!-- ── PAGE: MY COURSES (Student) ── -->
+    <section id="page-my-courses" class="hidden">
+      <div class="page-header">
+        <h1 class="page-title">My Courses</h1>
+        <p class="page-sub" id="my-courses-sub"></p>
+      </div>
+      <div class="course-grid" id="my-courses-grid"></div>
+    </section>
+
+    <!-- ── PAGE: MANAGE COURSES (Admin) ── -->
+    <section id="page-manage" class="hidden">
+      <div class="page-header">
+        <h1 class="page-title">Manage Courses</h1>
+        <p class="page-sub">Add, edit, and remove courses from the catalog</p>
+      </div>
+      <div class="stats-bar" id="manage-stats"></div>
+      <div class="toolbar">
+        <input class="search-box" type="text" id="manage-search"
+               placeholder="Search courses…" oninput="renderManage()" />
+        <button class="btn btn-primary" onclick="openModal()">＋ Add Course</button>
+      </div>
+      <div class="course-grid" id="manage-grid"></div>
+    </section>
+
+    <!-- ── PAGE: REGISTRATIONS (Admin) ── -->
+    <section id="page-registrations" class="hidden">
+      <div class="page-header">
+        <h1 class="page-title">All Registrations</h1>
+        <p class="page-sub" id="regs-sub"></p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Student</th>
+              <th>Email</th>
+              <th>Course</th>
+              <th>Code</th>
+              <th>Credits</th>
+            </tr>
+          </thead>
+          <tbody id="regs-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    
+    <section id="page-xml" class="hidden">
+      <div class="page-header anim-fadeup">
+        <h1 class="page-title">XML Data Export</h1>
+        <p class="page-sub">Structured XML representation of the live course catalog</p>
+      </div>
+      <div class="xml-viewer" id="xml-viewer"></div>
+    </section>
+
+  </main>
+</div>
+
+course modal
+<div class="modal-overlay hidden" id="course-modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <h2 class="modal-title" id="modal-title">Add New Course</h2>
+    <div id="modal-alert" class="alert hidden"></div>
+
+    <input type="hidden" id="modal-course-id" />
+
+    <div class="field-row">
+      <div class="field">
+        <label>Code *</label>
+        <input type="text" id="m-code" placeholder="CS101" />
+      </div>
+      <div class="field">
+        <label>Credits *</label>
+        <input type="number" id="m-credits" min="1" max="6" value="3" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Title *</label>
+      <input type="text" id="m-title" placeholder="Course title" />
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="m-desc" placeholder="Brief course description…"></textarea>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Instructor *</label>
+        <input type="text" id="m-instructor" placeholder="Dr. Smith" />
+      </div>
+      <div class="field">
+        <label>Capacity *</label>
+        <input type="number" id="m-capacity" min="1" value="30" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Schedule *</label>
+      <input type="text" id="m-schedule" placeholder="Mon/Wed 9:00–10:30" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCourse()">Save Course</button>
+    </div>
+  </div>
+</div>
+
+
+
+<script src="course.js"></script>
+</body>
+</html>

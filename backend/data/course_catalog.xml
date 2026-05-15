@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<courses>
+    <course>
+        <id>1</id>
+        <code>CS101</code>
+        <title>Introduction to Programming</title>
+        <description>Learn the fundamentals of programming and logic using PHP.</description>
+        <credits>3</credits>
+    </course>
+    <course>
+        <id>2</id>
+        <code>WEB202</code>
+        <title>Web Development Fundamentals</title>
+        <description>Build websites with HTML, CSS, JavaScript and server-side PHP.</description>
+        <credits>4</credits>
+    </course>
+    <course>
+        <id>3</id>
+        <code>DB303</code>
+        <title>Database Design</title>
+        <description>Design relational databases and interact with MySQL using PHP.</description>
+        <credits>3</credits>
+    </course>
+</courses>

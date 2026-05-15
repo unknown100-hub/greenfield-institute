@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenField Institute - Student Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .header, .container {
+            max-width: 760px;
+            margin: 0 auto 20px auto;
+            background-color: white;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        h1, h2 {
+            margin: 0;
+        }
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .course-btn, .logout-btn {
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .course-btn {
+            background-color: #2563eb;
+        }
+        .logout-btn {
+            background-color: #dc3545;
+        }
+        .details {
+            display: grid;
+            grid-template-columns: 180px 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+        .value {
+            color: #111827;
+        }
+        @media (max-width: 600px) {
+            .details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 id="welcomeTitle">Student Dashboard</h1>
+        <div class="header-actions">
+            <a class="course-btn" href="courses.html">Courses</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Your Registration</h2>
+        <div class="details">
+            <div class="label">Username</div>
+            <div class="value" id="studentUsername"></div>
+
+            <div class="label">Email</div>
+            <div class="value" id="studentEmail"></div>
+
+            <div class="label">Registration Number</div>
+            <div class="value" id="studentRegistrationNumber"></div>
+
+            <div class="label">Course</div>
+            <div class="value" id="studentCourse"></div>
+
+            <div class="label">Registered</div>
+            <div class="value" id="studentCreated"></div>
+        </div>
+    </div>
+
+    <script>
+        const student = JSON.parse(sessionStorage.getItem('student') || 'null');
+
+        if (!student) {
+            window.location.href = 'student-login.html';
+        } else {
+            document.getElementById('welcomeTitle').textContent = `Welcome, ${student.username || student.name}`;
+            document.getElementById('studentUsername').textContent = student.username || student.name || '';
+            document.getElementById('studentEmail').textContent = student.email || '';
+            document.getElementById('studentRegistrationNumber').textContent = student.registration_number || '';
+            document.getElementById('studentCourse').textContent = student.course_title ? `${student.course_code} - ${student.course_title}` : 'Not selected yet';
+            document.getElementById('studentCreated').textContent = student.created_at ? new Date(student.created_at).toLocaleDateString() : '';
+        }
+
+        function logout() {
+            sessionStorage.removeItem('student');
+            window.location.href = 'student-login.html';
+        }
+    </script>
+</body>
+</html>
