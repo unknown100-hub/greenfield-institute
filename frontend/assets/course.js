@@ -29,6 +29,7 @@ let nextCourseId = 10;
 let nextRegId    = 10;
 let currentPage  = "";
 let authTab      = "login";
+const API_BASE = "../../backend/routes/api.php";
 
 
 const $ = id => document.getElementById(id);
@@ -81,30 +82,77 @@ function showAuthAlert(msg) {
   el.className   = "alert alert-error";
 }
 
-function submitAuth() {
+async function apiPost(endpoint, payload) {
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const text = await response.text();
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch (error) {
+    throw new Error(text || "The server returned an invalid response.");
+  }
+
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || "Request failed.");
+  }
+
+  return data;
+}
+
+async function submitAuth() {
   const email = $("auth-email").value.trim();
   const pass  = $("auth-password").value;
 
   if (authTab === "login") {
-    const user = users.find(u => u.email === email && u.password === pass);
-    if (!user) return showAuthAlert("Invalid email or password. Please try again.");
-    loginSuccess(user);
+    if (!email || !pass) return showAuthAlert("Email and password are required.");
+
+    try {
+      let data;
+      let role = "student";
+
+      try {
+        data = await apiPost("/admin/login", { identifier: email, password: pass });
+        role = "admin";
+      } catch (adminError) {
+        data = await apiPost("/students/login", { email, password: pass });
+      }
+
+      const user = {
+        id: data.data?.id || 1,
+        name: data.data?.name || data.data?.username || email,
+        email: data.data?.email || email,
+        role,
+      };
+
+      sessionStorage.setItem(role, JSON.stringify(data.data || user));
+      loginSuccess(user);
+    } catch (error) {
+      showAuthAlert(error.message || "Invalid email or password. Please try again.");
+    }
   } else {
     const name = $("reg-name").value.trim();
     if (!name || !email || !pass) return showAuthAlert("All fields are required.");
     if (pass.length < 8)          return showAuthAlert("Password must be at least 8 characters.");
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email))  return showAuthAlert("Please enter a valid email address.");
-    if (users.find(u => u.email === email)) return showAuthAlert("This email is already registered.");
 
-    const newUser = { id: nextUserId++, name, email, password: pass, role: "student" };
-    users.push(newUser);
-    switchTab("login");
-    $("auth-email").value    = email;
-    $("auth-password").value = "";
-    const el = $("auth-alert");
-    el.textContent = "Account created! You can now sign in.";
-    el.className   = "alert alert-success";
+    try {
+      await apiPost("/students", { name, email, password: pass });
+      switchTab("login");
+      $("auth-email").value    = email;
+      $("auth-password").value = "";
+      const el = $("auth-alert");
+      el.textContent = "Account created and saved to the database. You can now sign in.";
+      el.className   = "alert alert-success";
+    } catch (error) {
+      showAuthAlert(error.message || "Could not create account.");
+    }
   }
 }
 

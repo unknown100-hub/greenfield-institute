@@ -177,7 +177,7 @@
         </div>
 
         <div class="filters">
-            <input type="text" id="searchInput" placeholder="Search by username, email, or registration number">
+            <input type="text" id="searchInput" placeholder="Search by full name or email">
         </div>
 
         <h2>Student Management</h2>
@@ -185,8 +185,7 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Username</th>
-                    <th>Registration No.</th>
+                    <th>Full Name</th>
                     <th>Email</th>
                     <th>Registered</th>
                     <th>Actions</th>
@@ -199,7 +198,7 @@
     </div>
 
     <script>
-        const API_BASE = '../backend/routes/api.php';
+        const API_BASE = '../../backend/routes/api.php';
         let students = [];
 
         document.getElementById('searchInput').addEventListener('input', function() {
@@ -242,16 +241,14 @@
                     return [
                         student.name,
                         student.username || '',
-                        student.email,
-                        student.registration_number || ''
+                        student.email
                     ].some(value => value.toLowerCase().includes(query));
                 })
                 .forEach(student => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${student.id}</td>
-                        <td>${student.username || student.name}</td>
-                        <td>${student.registration_number || ''}</td>
+                        <td>${student.name || student.username}</td>
                         <td>${student.email}</td>
                         <td>${new Date(student.created_at).toLocaleDateString()}</td>
                         <td class="actions">

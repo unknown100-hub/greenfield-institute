@@ -82,14 +82,11 @@
     <div class="container">
         <h2>Your Registration</h2>
         <div class="details">
-            <div class="label">Username</div>
-            <div class="value" id="studentUsername"></div>
+            <div class="label">Full Name</div>
+            <div class="value" id="studentName"></div>
 
             <div class="label">Email</div>
             <div class="value" id="studentEmail"></div>
-
-            <div class="label">Registration Number</div>
-            <div class="value" id="studentRegistrationNumber"></div>
 
             <div class="label">Course</div>
             <div class="value" id="studentCourse"></div>
@@ -106,9 +103,8 @@
             window.location.href = 'student-login.html';
         } else {
             document.getElementById('welcomeTitle').textContent = `Welcome, ${student.username || student.name}`;
-            document.getElementById('studentUsername').textContent = student.username || student.name || '';
+            document.getElementById('studentName').textContent = student.name || student.username || '';
             document.getElementById('studentEmail').textContent = student.email || '';
-            document.getElementById('studentRegistrationNumber').textContent = student.registration_number || '';
             document.getElementById('studentCourse').textContent = student.course_title ? `${student.course_code} - ${student.course_title}` : 'Not selected yet';
             document.getElementById('studentCreated').textContent = student.created_at ? new Date(student.created_at).toLocaleDateString() : '';
         }

@@ -20,8 +20,7 @@ class StudentController {
             return ['success' => false, 'message' => 'Database connection failed. Start MySQL in XAMPP and check backend/config/db.php.'];
         }
 
-        // Validate input
-        if (empty($data['username']) || empty($data['registration_number']) || empty($data['password']) || empty($data['email'])) {
+        if (empty($data['name']) || empty($data['password']) || empty($data['email'])) {
             return ['success' => false, 'message' => 'All fields are required.'];
         }
 
@@ -36,19 +35,11 @@ class StudentController {
             return ['success' => false, 'message' => 'Email already exists.'];
         }
 
-        // Check if registration number already exists
-        $this->student->registration_number = $data['registration_number'];
-        if ($this->student->registrationNumberExists()) {
-            return ['success' => false, 'message' => 'Registration number already exists.'];
-        }
-
         if (strlen($data['password']) < 8) {
             return ['success' => false, 'message' => 'Password must be at least 8 characters long.'];
         }
 
-        // Set student properties
-        $this->student->username = $data['username'];
-        $this->student->registration_number = $data['registration_number'];
+        $this->student->name = $data['name'];
         $this->student->password = $data['password'];
         $this->student->email = $data['email'];
 
@@ -59,9 +50,8 @@ class StudentController {
                 'message' => 'Student registered successfully.',
                 'data' => [
                     'id' => $this->db->lastInsertId(),
-                    'username' => $this->student->username,
-                    'name' => $this->student->username,
-                    'registration_number' => $this->student->registration_number,
+                    'name' => $this->student->name,
+                    'username' => $this->student->name,
                     'email' => $this->student->email
                 ]
             ];
@@ -75,12 +65,13 @@ class StudentController {
             return ['success' => false, 'message' => 'Database connection failed. Start MySQL in XAMPP and check backend/config/db.php.'];
         }
 
-        if (empty($data['identifier']) || empty($data['password'])) {
-            return ['success' => false, 'message' => 'Email or registration number and password are required.'];
+        $email = $data['email'] ?? $data['identifier'] ?? '';
+
+        if (empty($email) || empty($data['password'])) {
+            return ['success' => false, 'message' => 'Email and password are required.'];
         }
 
-        $this->student->email = $data['identifier'];
-        $this->student->registration_number = $data['identifier'];
+        $this->student->email = $email;
 
         if ($this->student->login()) {
             if (!password_verify($data['password'], $this->student->password)) {
@@ -92,9 +83,8 @@ class StudentController {
                 'message' => 'Login successful.',
                 'data' => [
                     'id' => $this->student->id,
-                    'username' => $this->student->username,
+                    'username' => $this->student->name,
                     'name' => $this->student->name,
-                    'registration_number' => $this->student->registration_number,
                     'email' => $this->student->email,
                     'course_id' => $this->student->course_id,
                     'course_code' => $this->student->course_code,
@@ -104,7 +94,7 @@ class StudentController {
             ];
         }
 
-        return ['success' => false, 'message' => 'No registration found with those details.'];
+        return ['success' => false, 'message' => 'No account found with that email.'];
     }
 
     public function getAllStudents() {
@@ -133,9 +123,8 @@ class StudentController {
         if (!empty($this->student->name)) {
             return [
                 'id' => $this->student->id,
-                'username' => $this->student->username,
+                'username' => $this->student->name,
                 'name' => $this->student->name,
-                'registration_number' => $this->student->registration_number,
                 'email' => $this->student->email,
                 'course_id' => $this->student->course_id,
                 'course_code' => $this->student->course_code,
@@ -160,8 +149,7 @@ class StudentController {
             return ['success' => false, 'message' => 'Student not found.'];
         }
 
-        // Validate input
-        if (empty($data['name']) || empty($data['email']) || empty($data['phone']) || empty($data['address']) || empty($data['date_of_birth'])) {
+        if (empty($data['name']) || empty($data['email'])) {
             return ['success' => false, 'message' => 'All fields are required.'];
         }
 
@@ -177,19 +165,6 @@ class StudentController {
             return ['success' => false, 'message' => 'Email already exists.'];
         }
 
-        // Validate date of birth
-        $dob = DateTime::createFromFormat('Y-m-d', $data['date_of_birth']);
-        if (!$dob || $dob->format('Y-m-d') !== $data['date_of_birth']) {
-            return ['success' => false, 'message' => 'Invalid date of birth format. Use YYYY-MM-DD.'];
-        }
-
-        // Check if student is at least 16 years old
-        $today = new DateTime();
-        $age = $today->diff($dob)->y;
-        if ($age < 16) {
-            return ['success' => false, 'message' => 'Student must be at least 16 years old.'];
-        }
-
         // Validate course selection if provided
         $courseId = isset($data['course_id']) ? $data['course_id'] : null;
         if ($courseId && !$this->courseController->validateCourseId($courseId)) {
@@ -199,9 +174,6 @@ class StudentController {
         // Set student properties
         $this->student->name = $data['name'];
         $this->student->email = $data['email'];
-        $this->student->phone = $data['phone'];
-        $this->student->address = $data['address'];
-        $this->student->date_of_birth = $data['date_of_birth'];
         $this->student->course_id = $courseId;
 
         // Update student

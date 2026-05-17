@@ -4,7 +4,7 @@
 
 ### Option A: PHP Built-in Server (Simple)
 ```powershell
-cd c:\Users\Admin\IAP\smartfield-institute
+cd c:\Users\Admin\WEB-APP\greenfield-institute
 php --version
 php -S localhost:8000
 ```
@@ -14,9 +14,24 @@ Then access: http://localhost:8000/frontend/index.html
 > If courses still do not appear, verify the API directly at `http://localhost:8000/backend/routes/api.php/courses`.
 
 ### Option B: Apache/Nginx
-Configure your web server to serve the `smartfield-institute` directory.
+Configure your web server to serve the `greenfield-institute` directory.
 
-## 2. Test API Endpoints
+## 2. Import the Database Schema
+
+If this is your first import:
+
+```powershell
+Get-Content backend\migrations\schema.sql | C:\xampp\mysql\bin\mysql.exe -u root -P 4306
+```
+
+If you previously imported the old schema with registration number columns, reset the database first:
+
+```powershell
+C:\xampp\mysql\bin\mysql.exe -u root -P 4306 -e "DROP DATABASE IF EXISTS greenfield_institute;"
+Get-Content backend\migrations\schema.sql | C:\xampp\mysql\bin\mysql.exe -u root -P 4306
+```
+
+## 3. Test API Endpoints
 
 ### Student Registration
 ```bash
@@ -25,9 +40,17 @@ curl -X POST http://localhost:8000/backend/routes/api.php/students \
   -d '{
     "name": "John Doe",
     "email": "john.doe@example.com",
-    "phone": "+1234567890",
-    "address": "123 Main St",
-    "date_of_birth": "2000-01-01"
+    "password": "password123"
+  }'
+```
+
+### Student Login
+```bash
+curl -X POST http://localhost:8000/backend/routes/api.php/students/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john.doe@example.com",
+    "password": "password123"
   }'
 ```
 
@@ -36,7 +59,7 @@ curl -X POST http://localhost:8000/backend/routes/api.php/students \
 curl -X POST http://localhost:8000/backend/routes/api.php/admin/login \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "admin",
+    "identifier": "admin@greenfield.edu",
     "password": "admin123"
   }'
 ```
@@ -57,7 +80,7 @@ curl -X GET http://localhost:8000/backend/routes/api.php/students \
   -H "Cookie: PHPSESSID=YOUR_SESSION_ID"
 ```
 
-## 3. Frontend Testing
+## 4. Frontend Testing
 
 1. Serve the application over HTTP, do not open `frontend/index.html` directly with `file://`.
    - If you are using PHP's built-in server, open `http://localhost:8000/frontend/index.html`.
@@ -65,7 +88,7 @@ curl -X GET http://localhost:8000/backend/routes/api.php/students \
 3. Open `frontend/admin.html` and login with admin/admin123
 4. Access the dashboard to manage students
 
-## 4. Expected Responses
+## 5. Expected Responses
 
 ### Successful Registration
 ```json

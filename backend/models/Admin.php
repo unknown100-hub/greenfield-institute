@@ -19,20 +19,24 @@ class Admin {
         $this->conn->exec(
             "CREATE TABLE IF NOT EXISTS " . $this->table_name . " (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(50) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
-                email VARCHAR(255) NOT NULL UNIQUE,
+                username VARCHAR(100) NULL UNIQUE,
+                password VARCHAR(255) NULL,
+                email VARCHAR(255) NULL UNIQUE,
+                role ENUM('admin', 'super_admin') NOT NULL DEFAULT 'admin',
+                is_active TINYINT(1) NOT NULL DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )"
         );
+
+        $this->ensureAccountColumns();
 
         $username = 'admin';
         $email = 'admin@greenfield.edu';
         $password = password_hash('admin123', PASSWORD_DEFAULT);
 
-        $query = "INSERT INTO " . $this->table_name . " (username, password, email)
-                  VALUES (:username, :password, :email)
-                  ON DUPLICATE KEY UPDATE password=:password_update, email=:email_update";
+        $query = "INSERT INTO " . $this->table_name . " (username, password, email, role)
+                  VALUES (:username, :password, :email, 'super_admin')
+                  ON DUPLICATE KEY UPDATE password=:password_update, email=:email_update, role='super_admin'";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':username', $username);
         $stmt->bindParam(':password', $password);
@@ -103,6 +107,54 @@ class Admin {
         }
 
         return false;
+    }
+
+    private function ensureAccountColumns() {
+        $requiredColumns = [
+            'username' => "ALTER TABLE " . $this->table_name . " ADD COLUMN username VARCHAR(100) NULL AFTER id",
+            'email' => "ALTER TABLE " . $this->table_name . " ADD COLUMN email VARCHAR(255) NULL AFTER username",
+            'password' => "ALTER TABLE " . $this->table_name . " ADD COLUMN password VARCHAR(255) NULL AFTER email",
+            'role' => "ALTER TABLE " . $this->table_name . " ADD COLUMN role ENUM('admin', 'super_admin') NOT NULL DEFAULT 'admin'",
+            'is_active' => "ALTER TABLE " . $this->table_name . " ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1",
+            'created_at' => "ALTER TABLE " . $this->table_name . " ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        ];
+
+        $stmt = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name);
+        $existingColumns = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'Field');
+
+        foreach ($requiredColumns as $column => $sql) {
+            if (!in_array($column, $existingColumns, true)) {
+                $this->conn->exec($sql);
+            }
+        }
+
+        $stmt = $this->conn->query("SHOW COLUMNS FROM " . $this->table_name);
+        $existingColumns = array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'Field');
+
+        foreach ([
+            'username' => "ALTER TABLE " . $this->table_name . " MODIFY username VARCHAR(100) NULL",
+            'email' => "ALTER TABLE " . $this->table_name . " MODIFY email VARCHAR(255) NULL",
+            'password' => "ALTER TABLE " . $this->table_name . " MODIFY password VARCHAR(255) NULL",
+            'password_hash' => "ALTER TABLE " . $this->table_name . " MODIFY password_hash VARCHAR(255) NULL",
+        ] as $legacyColumn => $sql) {
+            if (!in_array($legacyColumn, $existingColumns, true)) {
+                continue;
+            }
+
+            try {
+                $this->conn->exec($sql);
+            } catch (PDOException $e) {
+                error_log("Admin table compatibility update skipped: " . $e->getMessage());
+            }
+        }
+
+        if (in_array('password_hash', $existingColumns, true) && in_array('password', $existingColumns, true)) {
+            try {
+                $this->conn->exec("UPDATE " . $this->table_name . " SET password = password_hash WHERE password IS NULL AND password_hash IS NOT NULL");
+            } catch (PDOException $e) {
+                error_log("Legacy admin password migration skipped: " . $e->getMessage());
+            }
+        }
     }
 }
 ?>

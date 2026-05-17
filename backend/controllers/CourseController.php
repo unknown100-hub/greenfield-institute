@@ -54,7 +54,11 @@ class CourseController {
                 'code' => $this->course->code,
                 'title' => $this->course->title,
                 'description' => $this->course->description,
+                'desc' => $this->course->description,
                 'credits' => $this->course->credits,
+                'capacity' => $this->course->capacity,
+                'instructor' => $this->course->instructor,
+                'schedule' => $this->course->schedule,
             ];
         }
         return null;
@@ -101,7 +105,11 @@ class CourseController {
                 'code' => (string)$courseNode->code,
                 'title' => (string)$courseNode->title,
                 'description' => (string)$courseNode->description,
+                'desc' => (string)$courseNode->description,
                 'credits' => (int)$courseNode->credits,
+                'capacity' => isset($courseNode->capacity) ? (int)$courseNode->capacity : 30,
+                'instructor' => isset($courseNode->instructor) ? (string)$courseNode->instructor : 'To be assigned',
+                'schedule' => isset($courseNode->schedule) ? (string)$courseNode->schedule : 'To be announced',
             ];
         }
 

@@ -3,7 +3,7 @@ class Database {
 
     private $host = "localhost";
     private $port = 4306;
-    private $db_name = "greenfield institute";
+    private $db_name = "greenfield_institute";
     private $fallback_db_name = "smartfield institute";
     private $username = "root";
     private $password = "";
@@ -22,6 +22,10 @@ class Database {
             ];
 
             try {
+                $serverDsn = "mysql:host={$this->host};port={$this->port};charset=utf8mb4";
+                $serverConn = new PDO($serverDsn, $this->username, $this->password, $options);
+                $serverConn->exec("CREATE DATABASE IF NOT EXISTS `{$this->db_name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+
                 $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->db_name};charset=utf8mb4";
                 $this->conn = new PDO($dsn, $this->username, $this->password, $options);
             } catch(PDOException $e) {

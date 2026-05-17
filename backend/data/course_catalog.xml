@@ -6,6 +6,9 @@
         <title>Introduction to Programming</title>
         <description>Learn the fundamentals of programming and logic using PHP.</description>
         <credits>3</credits>
+        <capacity>30</capacity>
+        <instructor>Dr. Barini</instructor>
+        <schedule>Mon/Wed 9:00-10:30</schedule>
     </course>
     <course>
         <id>2</id>
@@ -13,6 +16,9 @@
         <title>Web Development Fundamentals</title>
         <description>Build websites with HTML, CSS, JavaScript and server-side PHP.</description>
         <credits>4</credits>
+        <capacity>25</capacity>
+        <instructor>Md. Gracel</instructor>
+        <schedule>Tue/Thu 11:00-13:30</schedule>
     </course>
     <course>
         <id>3</id>
@@ -20,5 +26,38 @@
         <title>Database Design</title>
         <description>Design relational databases and interact with MySQL using PHP.</description>
         <credits>3</credits>
+        <capacity>30</capacity>
+        <instructor>Prof. Mwenda</instructor>
+        <schedule>Mon/Wed/Fri 14:00-15:00</schedule>
+    </course>
+    <course>
+        <id>4</id>
+        <code>SMA2200</code>
+        <title>Calculus I</title>
+        <description>Limits, derivatives, and integrals.</description>
+        <credits>4</credits>
+        <capacity>35</capacity>
+        <instructor>Prof. Okello</instructor>
+        <schedule>Mon/Wed/Fri 10:00-11:00</schedule>
+    </course>
+    <course>
+        <id>5</id>
+        <code>SMA2100</code>
+        <title>System Design and Analysis</title>
+        <description>Learn requirements analysis, system modeling, and design documentation.</description>
+        <credits>3</credits>
+        <capacity>28</capacity>
+        <instructor>Prof. Smith</instructor>
+        <schedule>Tue/Thu 9:00-10:30</schedule>
+    </course>
+    <course>
+        <id>6</id>
+        <code>BUS201</code>
+        <title>Introduction to Abstract Algebra</title>
+        <description>Study binary operations, groups, rings, fields, and proof techniques.</description>
+        <credits>3</credits>
+        <capacity>40</capacity>
+        <instructor>Mr. Mwai</instructor>
+        <schedule>Wed/Fri 13:00-14:30</schedule>
     </course>
 </courses>

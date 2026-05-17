@@ -88,8 +88,8 @@
         <h1>Student Login</h1>
         <form id="studentLoginForm">
             <div class="form-group">
-                <label for="identifier">Email or Registration Number:</label>
-                <input type="text" id="identifier" name="identifier" required>
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
             </div>
 
             <div class="form-group">
@@ -108,13 +108,13 @@
     </div>
 
     <script>
-        const API_BASE = '../backend/routes/api.php';
+        const API_BASE = '../../backend/routes/api.php';
 
         document.getElementById('studentLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const formData = {
-                identifier: document.getElementById('identifier').value.trim(),
+                email: document.getElementById('email').value.trim(),
                 password: document.getElementById('password').value
             };
 
